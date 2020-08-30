@@ -72,7 +72,7 @@ class Quiz extends React.Component {
         }
 
         window.clearTimeout(timeout);
-      }, 1000)
+      }, 800)
     } else {   // ответили неправильно на вопрос 
       results[question.id] = 'error';
       this.setState({
