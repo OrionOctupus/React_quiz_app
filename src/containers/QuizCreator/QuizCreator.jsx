@@ -4,6 +4,7 @@ import Button from '../../components/UI/Button/Button';
 import { createControl, validate, validateForm } from '../../form/formFramework';
 import Input from '../../components/UI/Input/Input';
 import Select from '../../components/UI/Select/Select';
+import axios from '../../axios/axios-quiz';
 
 // локальные функции полезные только для этого модуля
 function createOptionControl(number) {
@@ -51,7 +52,7 @@ export default class QuizCreator extends React.Component {
     const { question, option1, option2, option3, option4 } = this.state.formControls;
 
     const questionItem = {
-      question: this.state.formControls.question.value,
+      question: question.value,
       id: index,
       rightAnswerId: this.state.rightAnswerId,
       answers: [
@@ -72,11 +73,33 @@ export default class QuizCreator extends React.Component {
     })
   }
 
-  createQuizHandler = (e) => {
+  //метод отправки на сервер готового теста
+  createQuizHandler = async (e) => {
     e.preventDefault();
-    console.log(this.state.quiz);
+    console.log('до запроса', this.state.quiz);
 
-    //TODO: server
+    try {
+      const response = await axios.post('/quizes.json', this.state.quiz)
+
+      //обнуление стейта после отправки данный в бд
+      this.setState({
+        quiz: [],
+        isFormValid: false,
+        rightAnswerId: 1,
+        formControls: createFormControls(),
+      })
+      console.log(response)
+    } catch (e) {
+      console.log(e)
+    }
+
+    //способ через библиотеку без es6+
+    //передаем в БД то что сформировано в стейте this.state.quiz
+    // axios.post('https://react-quiz-15ef6.firebaseio.com/quizes.json', this.state.quiz)
+    //   .then(response => {
+    //     console.log(response)
+    //   })
+    //   .catch(error => console.error(error))
   }
 
   changeHandler = (value, controlName) => {

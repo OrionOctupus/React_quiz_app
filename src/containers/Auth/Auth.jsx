@@ -3,6 +3,7 @@ import s from './Auth.module.css';
 import Button from '../../components/UI/Button/Button';
 import Input from '../../components/UI/Input/Input';
 import is from 'is_js';
+import axios from 'axios';
 
 // function validateEmail(email) {
 //   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -42,12 +43,36 @@ export default class Auth extends React.Component {
     }
   }
   //обработка входа 
-  loginHandler = () => {
+  loginHandler = async () => {
+    const authData = {
+      email: this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken: true
+    }
+    try {
+      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=[API_KEY]', authData)
 
+      console.log(response.data)
+    } catch (e) {
+      console.log(e)
+    }
   }
-  // обработка формы регистрации 
-  registerHandler = () => {
 
+
+  // обработка формы регистрации 
+  registerHandler = async () => {
+    const authData = {
+      email: this.state.formControls.email.value,
+      password: this.state.formControls.password.value,
+      returnSecureToken: true
+    }
+    try {
+      const response = await axios.post('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=[API_KEY]', authData)
+
+      console.log(response.data)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   //отменяет стандартное действие отправки формы

@@ -2,7 +2,8 @@ import React from 'react';
 import s from './Quiz.module.css';
 import ActiveQuiz from '../../components/ActiveQuiz/ActiveQuiz'
 import FinishedQuiz from '../../components/FinishedQuiz/FinishedQuiz';
-
+import axios from '../../axios/axios-quiz';
+import Loader from '../../components/UI/Loader/Loader';
 
 class Quiz extends React.Component {
 
@@ -12,29 +13,30 @@ class Quiz extends React.Component {
     activeQuestion: 0,
     answerState: null, //{[id]: 'success' or 'error'}
     quiz: [
-      {
-        question: 'Какого типа данных нет в Java Script?',
-        rightAnswerId: 3,
-        id: 1,
-        answers: [
-          { text: 'Boolean', id: 1 },
-          { text: 'Object', id: 2 },
-          { text: 'Array', id: 3 },
-          { text: 'Undefined', id: 4 },
-        ]
-      },
-      {
-        question: 'Какой метод удаляет элемент из начала массива ?',
-        rightAnswerId: 2,
-        id: 2,
-        answers: [
-          { text: 'push()', id: 1 },
-          { text: 'unshift()', id: 2 },
-          { text: 'pop()', id: 3 },
-          { text: 'shift()', id: 4 },
-        ]
-      }
-    ]
+      //   {
+      //     question: 'Какого типа данных нет в Java Script?',
+      //     rightAnswerId: 3,
+      //     id: 1,
+      //     answers: [
+      //       { text: 'Boolean', id: 1 },
+      //       { text: 'Object', id: 2 },
+      //       { text: 'Array', id: 3 },
+      //       { text: 'Undefined', id: 4 },
+      //     ]
+      //   },
+      //   {
+      //     question: 'Какой метод удаляет элемент из начала массива ?',
+      //     rightAnswerId: 2,
+      //     id: 2,
+      //     answers: [
+      //       { text: 'push()', id: 1 },
+      //       { text: 'unshift()', id: 2 },
+      //       { text: 'pop()', id: 3 },
+      //       { text: 'shift()', id: 4 },
+      //     ]
+      //   }
+    ],
+    loading: true,
   }
 
   onAnswerClickHandler = (answerId) => {
@@ -97,26 +99,47 @@ class Quiz extends React.Component {
     })
   }
 
+  async componentDidMount() {
+
+    try {
+      const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
+      const quiz = response.data
+
+      this.setState({
+        quiz,
+        loading: false
+      })
+    } catch (e) {
+      console.error(e);
+    }
+
+    console.log('Quiz ID = ', this.props.match.params.id);
+  }
+
   render() {
     console.log(this.state.results)
     return (
       <div className={s.Quiz}>
         <div className={s.QuizWrapper}>
           <h1>Выберите правильный ответ</h1>
-          {this.state.isFinished
-            ? <FinishedQuiz
-              results={this.state.results}
-              quiz={this.state.quiz}
-              retryHandler={this.retryHandler}
-            />
-            : <ActiveQuiz
-              answers={this.state.quiz[this.state.activeQuestion].answers}
-              question={this.state.quiz[this.state.activeQuestion].question}
-              onAnswerClick={this.onAnswerClickHandler}
-              quizLength={this.state.quiz.length}
-              answerNumber={this.state.activeQuestion + 1}
-              state={this.state.answerState}
-            />
+
+          {
+            this.state.loading
+              ? <Loader />
+              : this.state.isFinished
+                ? <FinishedQuiz
+                  results={this.state.results}
+                  quiz={this.state.quiz}
+                  retryHandler={this.retryHandler}
+                />
+                : <ActiveQuiz
+                  answers={this.state.quiz[this.state.activeQuestion].answers}
+                  question={this.state.quiz[this.state.activeQuestion].question}
+                  onAnswerClick={this.onAnswerClickHandler}
+                  quizLength={this.state.quiz.length}
+                  answerNumber={this.state.activeQuestion + 1}
+                  state={this.state.answerState}
+                />
           }
         </div>
       </div>
